@@ -1,4 +1,5 @@
 1. Descripció general
+
 Aquesta fase implementa la versió inicial del projecte ShopMicro utilitzant Docker Compose.
 L’objectiu és aixecar una arquitectura de microserveis funcional que inclou:
 
