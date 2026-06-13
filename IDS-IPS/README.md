@@ -1,4 +1,4 @@
-Aquí trobareu la configuració del pfSense que he fet servir per a dur a terme aquest projecte el qual porta instal·lat el Suricata, l'IDS/IPS escollit.
+Aquí trobareu la configuració del pfSense que he fet servir per a dur a terme aquest projecte, el qual porta instal·lat el Suricata, l'IDS/IPS escollit.
 
 Si poseu "Suricata" al cercador del fitxer, trobareu les línies de configuració d'aquest.
 
