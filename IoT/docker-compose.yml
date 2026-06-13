@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  mariadb:
+    image: mariadb:11
+    environment:
+      MYSQL_ROOT_PASSWORD: meteopass
+      MYSQL_DATABASE: meteorologia
+    volumes:
+      - ./mariadb/data:/var/lib/mysql
+      - ./mariadb/init:/docker-entrypoint-initdb.d
+    ports: ["3306:3306"]
+
+  mosquitto:
+    image: eclipse-mosquitto
+    ports: ["1883:1883"]
+    volumes: ["./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf"]
+
+  grafana:
+    image: grafana/grafana
+    ports: ["3000:3000"]
+    depends_on: ["mariadb"]
+
+  ingestor:
+    build: ./ingestor
+    depends_on: ["mariadb","mosquitto"]
