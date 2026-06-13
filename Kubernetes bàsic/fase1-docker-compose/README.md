@@ -52,7 +52,7 @@ fase1-docker-compose/
 │   └── Dockerfile
 │
 └── frontend/
-    └── index.html
+└── index.html
 
 3. Requisits previs
 
