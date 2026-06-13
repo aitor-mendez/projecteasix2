@@ -126,6 +126,7 @@ docker compose stop
 Aturar i eliminar contenidors, xarxes i volums efímers
 
 docker compose down
-✔ Eliminar també volums persistents (ATENCIÓ: esborra dades)
-bash
+
+Eliminar també volums persistents (ATENCIÓ: esborra dades)
+
 docker compose down -v
