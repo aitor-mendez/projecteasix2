@@ -1,0 +1,215 @@
+version: "3.9"
+
+services:
+
+  # --------------
+  # Bases de dades
+  # --------------
+
+  db-products:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: products
+      MYSQL_USER: products
+      MYSQL_PASSWORD_FILE: /run/secrets/db_products_password
+    secrets:
+      - db_root_password
+      - db_products_password
+    volumes:
+      - db_products_data:/var/lib/mysql
+    networks:
+      - backend_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  db-orders:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: orders
+      MYSQL_USER: orders
+      MYSQL_PASSWORD_FILE: /run/secrets/db_products_password
+    secrets:
+      - db_root_password
+      - db_orders_password
+    volumes:
+      - db_orders_data:/var/lib/mysql
+    networks:
+      - backend_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  # -----
+  # Redis
+  # -----
+
+  cache:
+    image: redis:7.4.6-alpine
+    networks:
+      - backend_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  # --------
+  # RabbitMQ
+  # --------
+
+  message-queue:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend_network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  # ------------
+  # Microserveis
+  # ------------
+
+  product-service:
+    image: aitormendez/product-service:1.0
+    environment:
+      - MQ_HOST=shopmicro_message-queue
+    networks:
+      - backend_network
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  order-service:
+    image: aitormendez/order-service:1.0
+    environment:
+      - MQ_HOST=shopmicro_message-queue
+    networks:
+      - backend_network
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  user-service:
+    image: aitormendez/user-service:1.0
+    environment:
+      - MQ_HOST=shopmicro_message-queue
+    networks:
+      - backend_network
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  notification-service:
+    image: aitormendez/notification-service:1.0
+    environment:
+      - MQ_HOST=shopmicro_message-queue
+    networks:
+      - backend_network
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  # ----------------------
+  # API Gateway i Frontend
+  # ----------------------
+
+  api-gateway:
+    image: nginx:latest
+    ports:
+      - "8090:80"
+    networks:
+      - frontend_network
+      - backend_network
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  frontend:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    networks:
+      - frontend_network
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+
+  # ------------------------
+  # Xarxes, volums i secrets
+  # ------------------------
+
+networks:
+  frontend_network:
+    driver: overlay
+  backend_network:
+    driver: overlay
+
+volumes:
+  db_products_data:
+  db_orders_data:
+  rabbitmq_data:
+
+secrets:
+  db_root_password:
+    external: true
+  db_products_password:
+    external: true
+  db_orders_password:
+    external: true

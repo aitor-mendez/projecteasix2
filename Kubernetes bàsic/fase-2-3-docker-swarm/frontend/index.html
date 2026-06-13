@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>ShopMicro</title>
+	</head>
+	<body>
+		<h1>Benvingut a ShopMicro</h1>
+		
+		<h2>Productes</h2>
+		<button onclick="loadProducts()">Carregar productes</button>
+		<pre id="products"></pre>
+
+		<h2>Comanda</h2>
+		<button onclick="createOrder()">Crear comanda</button>
+		<pre id="login"></pre>
+
+		<h2>Login</h2>
+		<button onclick="login()">Login</button>
+		<pre id="login"></pre>
+
+		<script>
+			function loadProducts() {
+				fetch("http://localhost:8090/products")
+					.then(r => r.json())
+					.then(d => document.getElementById("products".textContent = JSON.stringify(d, null, 2));
+			}
+
+			function createOrder() {
+				fetch("http://localhost.8090/order")
+					.then(r => r.json())
+					.then(d => document.getElementById("order".textContent = JSON.stringify(d, null, 2));
+			}
+
+			function login() {
+				fetch("http://localhost.8090/login")
+					.then(r => r.json())
+					.then(d => document.getElementById("login".textContent = JSON.stringify(d, null, 2));
+			}
+		</script>
+	</body>
+</html>
