@@ -21,13 +21,12 @@ api-gateway → Nginx com a reverse proxy
 
 frontend → interfície web HTML/JS
 
-Aquesta fase és la base per a la Fase 2 (Docker Swarm).
-
 2. Estructura del directori
 
 fase1-docker-compose/
 │
 ├── docker-compose.yml
+│
 ├── api-gateway/
 │   └── nginx.conf
 │
@@ -54,25 +53,54 @@ fase1-docker-compose/
 └── frontend/
 └── index.html
 
+fase-2-3-docker-swarm/
+|
+├── api-gateway
+│   └── nginx.conf
+|
+├── docker-stack.yml
+├── frontend
+│   └── index.html
+|
+├── notification-service
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── worker.py
+|
+├── order-service
+│   ├── Dockerfile
+│   ├── app.py
+│   └── requirements.txt
+|
+├── product-service
+│   ├── Dockerfile
+│   ├── app.py
+│   └── requirements.txt
+|
+└── user-service
+    ├── Dockerfile
+    ├── app.py
+    └── requirements.txt
+
 3. Requisits previs
 
-Docker instal·lat
+- Docker instal·lat
 
-Docker Compose v2
+- Docker Compose v2
 
-Port 8080 lliure (frontend)
+- Port 8080 lliure (frontend)
 
-Port 8090 lliure (API Gateway)
+- Port 8090 lliure (API Gateway)
 
-Ports de MySQL, Redis i RabbitMQ lliures
+- Ports de MySQL, Redis i RabbitMQ lliures
 
 4. Com aixecar tota l’arquitectura
 
-1) Construir i aixecar els serveis
+1) Construir i aixecar els serveis:
 
 docker compose up -d --build
 
-3) Comprovar l’estat dels contenidors
+3) Comprovar l’estat dels contenidors:
 
 docker compose ps
 
@@ -86,18 +114,17 @@ up → api-gateway i frontend
 
 5. Accés a la plataforma
 
-Frontend
+Frontend:
 http://localhost:8080
 
-API Gateway
+API Gateway:
 http://localhost:8090
 
-RabbitMQ (panell de control)
+RabbitMQ (panell de control):
 http://localhost:15672
 
-MySQL (productes i comandes)
+MySQL (productes i comandes):
 Host: db-products o db-orders
-
 Port: 3306
 
 Usuari: definit al docker-compose
@@ -106,28 +133,30 @@ Contrasenya: definida al docker-compose
 
 6. Flux de funcionament
 
-L’usuari accedeix al frontend
+1- L’usuari accedeix al frontend
 
-Fa login → petició a /login via API Gateway
+2- Fa login → petició a /login via API Gateway
 
-Carrega productes → /products
+3- Carrega productes → /products
 
-Crea una comanda → /order
+4- Crea una comanda → /order
 
-L’order-service envia un missatge a RabbitMQ
+5- L’order-service envia un missatge a RabbitMQ
 
-El notification-service processa l’esdeveniment
+6- El notification-service processa l’esdeveniment
 
 7. Com aturar i eliminar els serveis
 
-Aturar contenidors sense eliminar-los
+Aturar contenidors sense eliminar-los:
 
 docker compose stop
 
-Aturar i eliminar contenidors, xarxes i volums efímers
+Aturar i eliminar contenidors, xarxes i volums efímers:
 
 docker compose down
 
-Eliminar també volums persistents (ATENCIÓ: esborra dades)
+Eliminar també volums persistents (ATENCIÓ: esborra dades):
+
+docker compose down -v
 
 docker compose down -v
